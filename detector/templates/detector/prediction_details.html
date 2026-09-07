@@ -1,0 +1,380 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Prediction Details · NeuroScan AI
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'detector/style.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+<nav class="navbar">
+
+
+    <a
+        href="{% url 'home' %}"
+        class="brand"
+    >
+
+        <div class="brand-icon">
+            N
+        </div>
+
+
+        <div class="brand-text">
+
+            <h2>
+                NeuroScan AI
+            </h2>
+
+            <span>
+                Brain Tumor Detection
+            </span>
+
+        </div>
+
+    </a>
+
+
+    <div class="nav-links">
+
+        <a
+            href="{% url 'home' %}"
+            class="nav-link"
+        >
+            Dashboard
+        </a>
+
+
+        <a
+            href="{% url 'history' %}"
+            class="nav-link"
+        >
+            History
+        </a>
+
+
+        <a
+            href="{% url 'logout' %}"
+            class="nav-link"
+        >
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<main class="container">
+
+
+    <div class="page-header">
+
+        <h1>
+            Prediction Details
+        </h1>
+
+        <p>
+            Detailed AI analysis for this MRI scan.
+        </p>
+
+    </div>
+
+
+
+    <section class="card">
+
+
+        <div class="detail-grid">
+
+
+            <!-- MRI -->
+
+            <div class="detail-image">
+
+                <img
+                    src="{{ prediction.image.url }}"
+                    alt="MRI Scan"
+                >
+
+            </div>
+
+
+
+            <!-- DETAILS -->
+
+            <div class="detail-result">
+
+
+                <div class="detail-id">
+
+                    Prediction #{{ prediction.id }}
+
+                </div>
+
+
+                <div class="prediction-label">
+
+                    Predicted Classification
+
+                </div>
+
+
+                <div class="prediction-name">
+
+                    {{ prediction.predicted_class }}
+
+                </div>
+
+
+                <div class="confidence-box">
+
+                    <div class="confidence-label">
+
+                        MODEL CONFIDENCE
+
+                    </div>
+
+
+                    <div class="confidence-value">
+
+                        {{ prediction.confidence_percentage }}%
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="probability-section">
+
+
+                    <h3>
+                        Class Probabilities
+                    </h3>
+
+
+                    <!-- GLIOMA -->
+
+                    <div class="probability-row">
+
+                        <div class="probability-header">
+
+                            <span>
+                                Glioma
+                            </span>
+
+                            <span>
+                                {{ prediction.glioma_percentage }}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="progress">
+
+                            <div
+                                class="progress-bar"
+                                style="width: {{ prediction.glioma_percentage }}%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- MENINGIOMA -->
+
+                    <div class="probability-row">
+
+                        <div class="probability-header">
+
+                            <span>
+                                Meningioma
+                            </span>
+
+                            <span>
+                                {{ prediction.meningioma_percentage }}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="progress">
+
+                            <div
+                                class="progress-bar"
+                                style="width: {{ prediction.meningioma_percentage }}%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- NO TUMOR -->
+
+                    <div class="probability-row">
+
+                        <div class="probability-header">
+
+                            <span>
+                                No Tumor
+                            </span>
+
+                            <span>
+                                {{ prediction.no_tumor_percentage }}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="progress">
+
+                            <div
+                                class="progress-bar"
+                                style="width: {{ prediction.no_tumor_percentage }}%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PITUITARY -->
+
+                    <div class="probability-row">
+
+                        <div class="probability-header">
+
+                            <span>
+                                Pituitary Tumor
+                            </span>
+
+                            <span>
+                                {{ prediction.pituitary_tumor_percentage }}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="progress">
+
+                            <div
+                                class="progress-bar"
+                                style="width: {{ prediction.pituitary_tumor_percentage }}%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="info-row">
+
+                    <span>
+                        User
+                    </span>
+
+                    <span>
+                        {{ prediction.user.username }}
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span>
+                        Date
+                    </span>
+
+                    <span>
+                        {{ prediction.created_at|date:"M d, Y · h:i A" }}
+                    </span>
+
+                </div>
+
+
+                <br>
+
+
+                <a
+                    href="{% url 'history' %}"
+                    class="btn btn-outline"
+                >
+
+                    ← Back to History
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <div class="disclaimer">
+
+        <strong>
+            Important:
+        </strong>
+
+        This prediction is generated by an AI model for
+        educational and research purposes. It is not a
+        medical diagnosis. Please consult a qualified
+        healthcare professional for medical evaluation.
+
+    </div>
+
+
+</main>
+
+
+
+<footer class="footer">
+
+    NeuroScan AI
+    ·
+    Educational / Research Use Only
+
+</footer>
+
+
+</body>
+
+</html>

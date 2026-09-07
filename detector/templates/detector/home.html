@@ -1,0 +1,678 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        NeuroScan AI
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'detector/style.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVBAR
+     ===================================================== -->
+
+<nav class="navbar">
+
+    <a
+        href="{% url 'home' %}"
+        class="brand"
+    >
+
+        <div class="brand-icon">
+            N
+        </div>
+
+        <div class="brand-text">
+
+            <h2>
+                NeuroScan AI
+            </h2>
+
+            <span>
+                Brain Tumor Detection
+            </span>
+
+        </div>
+
+    </a>
+
+
+    <div class="nav-links">
+
+        <a
+            href="{% url 'home' %}"
+            class="nav-link"
+        >
+            Dashboard
+        </a>
+
+
+        <a
+            href="{% url 'history' %}"
+            class="nav-link"
+        >
+            History
+        </a>
+
+
+        <div class="nav-user">
+
+            <div class="user-avatar">
+                {{ request.user.username|first|upper }}
+            </div>
+
+            <span>
+                {{ request.user.username }}
+            </span>
+
+        </div>
+
+
+        <a
+            href="{% url 'logout' %}"
+            class="nav-link"
+        >
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- =====================================================
+     MAIN
+     ===================================================== -->
+
+<main class="container">
+
+
+    <!-- =================================================
+         HERO
+         ================================================= -->
+
+    <section class="hero">
+
+        <div>
+
+            <div class="hero-label">
+                ● AI-Powered MRI Analysis
+            </div>
+
+
+            <h1>
+                Intelligent
+                <span>Brain Tumor</span>
+                Detection
+            </h1>
+
+
+            <p>
+                Upload a brain MRI scan and our trained
+                deep learning model will analyze the image
+                and provide a predicted classification
+                with confidence scores.
+            </p>
+
+        </div>
+
+
+        <div class="hero-visual">
+
+            <div class="brain-circle">
+                🧠
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         UPLOAD CARD
+         ================================================= -->
+
+    <section class="card upload-card">
+
+        <div class="card-header">
+
+            <h2>
+                Analyze MRI Scan
+            </h2>
+
+            <p>
+                Upload a brain MRI image for AI-assisted analysis.
+            </p>
+
+        </div>
+
+
+        <div class="card-body">
+
+
+            {% if error %}
+
+                <div class="alert alert-error">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                id="uploadForm"
+            >
+
+                {% csrf_token %}
+
+
+                <!-- =====================================
+                     UPLOAD ZONE
+                     ===================================== -->
+
+                <label
+                    for="mri_image"
+                    class="upload-zone"
+                    id="uploadZone"
+                >
+
+                    <div class="upload-icon">
+                        ↑
+                    </div>
+
+
+                    <h3>
+                        Upload MRI Scan
+                    </h3>
+
+
+                    <p>
+                        Drag & drop your MRI image here
+                    </p>
+
+
+                    <span class="upload-or">
+                        or
+                    </span>
+
+
+                    <span class="choose-file">
+                        Browse Files
+                    </span>
+
+
+                    <p class="upload-format">
+                        PNG, JPG or JPEG · Maximum recommended size: 10 MB
+                    </p>
+
+
+                    <input
+                        id="mri_image"
+                        class="hidden-file-input"
+                        type="file"
+                        name="mri_image"
+                        accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                        required
+                    >
+
+                </label>
+
+
+                <!-- =====================================
+                     SELECTED FILE
+                     ===================================== -->
+
+                <div
+                    class="selected-file"
+                    id="selectedFile"
+                >
+
+                    <div class="file-icon">
+                        MRI
+                    </div>
+
+
+                    <div class="file-info">
+
+                        <strong id="fileName">
+                            No file selected
+                        </strong>
+
+                        <span id="fileSize">
+                            Select an MRI image to continue
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     ANALYZE BUTTON
+                     ===================================== -->
+
+                <button
+                    type="submit"
+                    class="btn btn-primary analyze-btn"
+                >
+                    Analyze MRI
+                </button>
+
+
+            </form>
+
+
+            <!-- =========================================
+                 DISCLAIMER
+                 ========================================= -->
+
+            <div class="disclaimer">
+
+                <strong>
+                    Important:
+                </strong>
+
+                This application is intended for educational
+                and research purposes only. AI predictions should
+                not be considered a medical diagnosis or a
+                substitute for professional medical advice.
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         RESULT CARD
+         ================================================= -->
+
+    {% if uploaded %}
+
+        <section class="card result-card">
+
+
+            <div class="card-header">
+
+                <h2>
+                    Analysis Result
+                </h2>
+
+                <p>
+                    AI prediction generated from the uploaded MRI.
+                </p>
+
+            </div>
+
+
+            <div class="card-body">
+
+
+                <div class="result-main">
+
+
+                    <!-- MRI IMAGE -->
+
+                    <div class="mri-preview">
+
+                        <img
+                            src="{{ file_path }}"
+                            alt="Uploaded MRI"
+                        >
+
+                    </div>
+
+
+                    <!-- RESULT INFORMATION -->
+
+                    <div>
+
+
+                        <div class="prediction-label">
+                            Predicted Classification
+                        </div>
+
+
+                        <div class="prediction-name">
+                            {{ prediction }}
+                        </div>
+
+
+                        <!-- CONFIDENCE -->
+
+                        <div class="confidence-box">
+
+                            <div class="confidence-label">
+                                MODEL CONFIDENCE
+                            </div>
+
+
+                            <div class="confidence-value">
+                                {{ confidence }}%
+                            </div>
+
+                        </div>
+
+
+                        <!-- PROBABILITIES -->
+
+                        <div class="probability-section">
+
+
+                            <!-- GLIOMA -->
+
+                            <div class="probability-row">
+
+                                <div class="probability-header">
+
+                                    <span>
+                                        Glioma
+                                    </span>
+
+                                    <span>
+                                        {{ glioma }}%
+                                    </span>
+
+                                </div>
+
+
+                                <div class="progress">
+
+                                    <div
+                                        class="progress-bar"
+                                        style="width: {{ glioma }}%;"
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- MENINGIOMA -->
+
+                            <div class="probability-row">
+
+                                <div class="probability-header">
+
+                                    <span>
+                                        Meningioma
+                                    </span>
+
+                                    <span>
+                                        {{ meningioma }}%
+                                    </span>
+
+                                </div>
+
+
+                                <div class="progress">
+
+                                    <div
+                                        class="progress-bar"
+                                        style="width: {{ meningioma }}%;"
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- NO TUMOR -->
+
+                            <div class="probability-row">
+
+                                <div class="probability-header">
+
+                                    <span>
+                                        No Tumor
+                                    </span>
+
+                                    <span>
+                                        {{ no_tumor }}%
+                                    </span>
+
+                                </div>
+
+
+                                <div class="progress">
+
+                                    <div
+                                        class="progress-bar"
+                                        style="width: {{ no_tumor }}%;"
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PITUITARY -->
+
+                            <div class="probability-row">
+
+                                <div class="probability-header">
+
+                                    <span>
+                                        Pituitary Tumor
+                                    </span>
+
+                                    <span>
+                                        {{ pituitary_tumor }}%
+                                    </span>
+
+                                </div>
+
+
+                                <div class="progress">
+
+                                    <div
+                                        class="progress-bar"
+                                        style="width: {{ pituitary_tumor }}%;"
+                                    ></div>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+</main>
+
+
+<!-- =====================================================
+     FOOTER
+     ===================================================== -->
+
+<footer class="footer">
+
+    NeuroScan AI
+    ·
+    Educational / Research Use Only
+
+</footer>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+     ===================================================== -->
+
+<script>
+
+    const uploadZone =
+        document.getElementById("uploadZone");
+
+    const fileInput =
+        document.getElementById("mri_image");
+
+    const selectedFile =
+        document.getElementById("selectedFile");
+
+    const fileName =
+        document.getElementById("fileName");
+
+    const fileSize =
+        document.getElementById("fileSize");
+
+
+    /* =====================================================
+       FILE SELECTED
+       ===================================================== */
+
+    fileInput.addEventListener(
+        "change",
+        function () {
+
+            if (this.files.length === 0) {
+
+                selectedFile.classList.remove(
+                    "visible"
+                );
+
+                return;
+
+            }
+
+
+            showSelectedFile(
+                this.files[0]
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       DRAG OVER
+       ===================================================== */
+
+    uploadZone.addEventListener(
+        "dragover",
+        function (event) {
+
+            event.preventDefault();
+
+            uploadZone.classList.add(
+                "dragging"
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       DRAG LEAVE
+       ===================================================== */
+
+    uploadZone.addEventListener(
+        "dragleave",
+        function () {
+
+            uploadZone.classList.remove(
+                "dragging"
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       DROP
+       ===================================================== */
+
+    uploadZone.addEventListener(
+        "drop",
+        function (event) {
+
+            event.preventDefault();
+
+            uploadZone.classList.remove(
+                "dragging"
+            );
+
+
+            const files =
+                event.dataTransfer.files;
+
+
+            if (files.length > 0) {
+
+                fileInput.files = files;
+
+                showSelectedFile(
+                    files[0]
+                );
+
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       DISPLAY SELECTED FILE
+       ===================================================== */
+
+    function showSelectedFile(file) {
+
+        fileName.textContent =
+            file.name;
+
+
+        const sizeInMB =
+            file.size / (1024 * 1024);
+
+
+        fileSize.textContent =
+            sizeInMB.toFixed(2) + " MB";
+
+
+        selectedFile.classList.add(
+            "visible"
+        );
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

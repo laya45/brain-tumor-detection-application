@@ -1,0 +1,153 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Welcome · NeuroScan AI
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'detector/style.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+<nav class="navbar">
+
+
+    <a
+        href="{% url 'auth_choice' %}"
+        class="brand"
+    >
+
+        <div class="brand-icon">
+            N
+        </div>
+
+
+        <div class="brand-text">
+
+            <h2>
+                NeuroScan AI
+            </h2>
+
+            <span>
+                Brain Tumor Detection
+            </span>
+
+        </div>
+
+    </a>
+
+
+</nav>
+
+
+
+<div class="choice-wrapper">
+
+
+    <section class="choice-card">
+
+
+        <div class="choice-header">
+
+
+            <div class="auth-logo">
+                N
+            </div>
+
+
+            <h1>
+                Welcome to NeuroScan AI
+            </h1>
+
+
+            <p>
+                AI-assisted brain MRI analysis for
+                educational and research purposes.
+            </p>
+
+
+        </div>
+
+
+
+        <div class="choice-buttons">
+
+
+            <div class="choice-box">
+
+                <h3>
+                    Already have an account?
+                </h3>
+
+
+                <p>
+                    Sign in to access your dashboard
+                    and prediction history.
+                </p>
+
+
+                <a
+                    href="{% url 'login' %}"
+                    class="btn btn-primary"
+                >
+                    Sign In
+                </a>
+
+            </div>
+
+
+
+            <div class="choice-box">
+
+                <h3>
+                    New to NeuroScan?
+                </h3>
+
+
+                <p>
+                    Create an account to start
+                    analyzing MRI scans.
+                </p>
+
+
+                <a
+                    href="{% url 'register' %}"
+                    class="btn btn-secondary"
+                >
+                    Create Account
+                </a>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+</body>
+
+</html>

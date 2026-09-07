@@ -1,0 +1,211 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Create Account | NeuroScan AI
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'detector/style.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVBAR
+     ===================================================== -->
+
+<nav class="navbar">
+
+    <a
+        href="{% url 'auth_choice' %}"
+        class="brand"
+    >
+
+        <div class="brand-icon">
+            N
+        </div>
+
+        <div class="brand-text">
+
+            <h2>
+                NeuroScan AI
+            </h2>
+
+            <span>
+                Brain Tumor Detection
+            </span>
+
+        </div>
+
+    </a>
+
+</nav>
+
+
+<!-- =====================================================
+     REGISTER
+     ===================================================== -->
+
+<div class="auth-wrapper">
+
+
+    <section class="auth-card">
+
+
+        <!-- HEADER -->
+
+        <div class="auth-header">
+
+            <div class="auth-logo">
+                N
+            </div>
+
+
+            <h1>
+                Create Account
+            </h1>
+
+
+            <p>
+                Create your account to start analyzing MRI scans.
+            </p>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        {% if error %}
+
+            <div class="alert alert-error">
+
+                {{ error }}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- FORM -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <!-- USERNAME -->
+
+            <div class="form-group">
+
+                <label for="username">
+                    Username
+                </label>
+
+                <input
+                    id="username"
+                    class="form-control"
+                    type="text"
+                    name="username"
+                    placeholder="Choose a username"
+                    autocomplete="username"
+                    required
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    id="password"
+                    class="form-control"
+                    type="password"
+                    name="password"
+                    placeholder="Create a password"
+                    autocomplete="new-password"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CONFIRM PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="password2">
+                    Confirm Password
+                </label>
+
+                <input
+                    id="password2"
+                    class="form-control"
+                    type="password"
+                    name="password2"
+                    placeholder="Repeat your password"
+                    autocomplete="new-password"
+                    required
+                >
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                class="btn btn-secondary full-btn"
+            >
+
+                Create Account
+
+            </button>
+
+        </form>
+
+
+        <!-- LOGIN -->
+
+        <div class="auth-footer">
+
+            Already have an account?
+
+            <a href="{% url 'login' %}">
+                Sign In
+            </a>
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+</body>
+
+</html>

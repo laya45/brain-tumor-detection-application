@@ -1,0 +1,343 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Prediction History | NeuroScan AI</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'detector/style.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+<nav class="navbar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            N
+        </div>
+
+        <div class="brand-text">
+
+            <h2>
+                NeuroScan AI
+            </h2>
+
+            <span>
+                Brain MRI Analysis
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="nav-links">
+
+        <a
+            href="{% url 'home' %}"
+            class="nav-link"
+        >
+            Dashboard
+        </a>
+
+        <a
+            href="{% url 'history' %}"
+            class="nav-link"
+        >
+            History
+        </a>
+
+
+        <div class="nav-user">
+
+            <div class="user-avatar">
+
+                {{ request.user.username|first|upper }}
+
+            </div>
+
+            <span>
+
+                {{ request.user.username }}
+
+            </span>
+
+        </div>
+
+
+        <a
+            href="{% url 'logout' %}"
+            class="nav-link"
+        >
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
+
+<main class="container">
+
+
+    <!-- =================================================
+         PAGE HEADER
+    ================================================== -->
+
+    <div class="page-header">
+
+        <h1>
+            Prediction History
+        </h1>
+
+        <p>
+            View your previous MRI analyses and results.
+        </p>
+
+    </div>
+
+
+
+    <!-- =================================================
+         NEW ANALYSIS BUTTON
+    ================================================== -->
+
+    <div style="
+        display: flex;
+        justify-content: flex-end;
+        margin-top: -10px;
+        margin-bottom: 22px;
+    ">
+
+        <a
+            href="{% url 'home' %}"
+            class="btn btn-primary"
+        >
+            + New Analysis
+        </a>
+
+    </div>
+
+
+
+    {% if predictions %}
+
+
+    <!-- =================================================
+         HISTORY CARD
+    ================================================== -->
+
+    <div class="card history-card">
+
+        <div class="history-table-wrapper">
+
+            <table class="history-table">
+
+
+                <!-- TABLE HEADER -->
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            MRI
+                        </th>
+
+                        <th>
+                            Prediction
+                        </th>
+
+                        <th>
+                            Confidence
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+
+                <!-- TABLE BODY -->
+
+                <tbody>
+
+
+                    {% for prediction in predictions %}
+
+
+                    <tr>
+
+
+                        <!-- MRI IMAGE -->
+
+                        <td>
+
+                            <a
+                                href="{% url 'prediction_detail' prediction.id %}"
+                            >
+
+                                <img
+                                    src="{{ prediction.image.url }}"
+                                    alt="MRI Scan"
+                                    class="history-image"
+                                >
+
+                            </a>
+
+                        </td>
+
+
+
+                        <!-- PREDICTION -->
+
+                        <td>
+
+                            <a
+                                href="{% url 'prediction_detail' prediction.id %}"
+                                class="prediction-link"
+                            >
+
+                                {{ prediction.predicted_class }}
+
+                            </a>
+
+                        </td>
+
+
+
+                        <!-- CONFIDENCE -->
+
+                        <td>
+
+                            <span class="confidence-badge">
+
+                                {{ prediction.confidence_display }}%
+
+                            </span>
+
+                        </td>
+
+
+
+                        <!-- DATE -->
+
+                        <td>
+
+                            <span class="history-date">
+
+                                {{ prediction.created_at|date:"M d, Y · h:i A" }}
+
+                            </span>
+
+                        </td>
+
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </tbody>
+
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- =================================================
+         EMPTY STATE
+    ================================================== -->
+
+    <div class="card empty-state">
+
+
+        <div class="empty-icon">
+            📋
+        </div>
+
+
+        <h3>
+            No predictions yet
+        </h3>
+
+
+        <p>
+            Upload an MRI scan to see your prediction
+            history here.
+        </p>
+
+
+        <a
+            href="{% url 'home' %}"
+            class="btn btn-primary"
+        >
+            Analyze MRI
+        </a>
+
+
+    </div>
+
+
+    {% endif %}
+
+
+</main>
+
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer class="footer">
+
+    NeuroScan AI • MRI Analysis Platform
+
+    <br>
+
+    For educational and research purposes only.
+
+</footer>
+
+
+</body>
+
+</html>

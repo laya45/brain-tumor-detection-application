@@ -1,0 +1,179 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Sign In · NeuroScan AI
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'detector/style.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+<nav class="navbar">
+
+
+    <a
+        href="{% url 'auth_choice' %}"
+        class="brand"
+    >
+
+        <div class="brand-icon">
+            N
+        </div>
+
+
+        <div class="brand-text">
+
+            <h2>
+                NeuroScan AI
+            </h2>
+
+            <span>
+                Brain Tumor Detection
+            </span>
+
+        </div>
+
+    </a>
+
+
+</nav>
+
+
+
+<div class="auth-wrapper">
+
+
+    <section class="auth-card">
+
+
+        <div class="auth-header">
+
+
+            <div class="auth-logo">
+                N
+            </div>
+
+
+            <h1>
+                Welcome Back
+            </h1>
+
+
+            <p>
+                Sign in to continue to your dashboard.
+            </p>
+
+
+        </div>
+
+
+
+        {% if error %}
+
+            <div class="alert alert-error">
+
+                {{ error }}
+
+            </div>
+
+        {% endif %}
+
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <div class="form-group">
+
+                <label>
+                    Username
+                </label>
+
+
+                <input
+                    class="form-control"
+                    type="text"
+                    name="username"
+                    placeholder="Enter your username"
+                    required
+                >
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Password
+                </label>
+
+
+                <input
+                    class="form-control"
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+            </div>
+
+
+
+            <button
+                type="submit"
+                class="btn btn-primary full-btn"
+            >
+
+                Sign In
+
+            </button>
+
+
+        </form>
+
+
+
+        <div class="auth-footer">
+
+            New user?
+
+            <a href="{% url 'register' %}">
+                Create an account
+            </a>
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+</body>
+
+</html>
