@@ -115,7 +115,7 @@
             <div class="detail-image">
 
                 <img
-                    src="{{ prediction.image.url }}"
+                    src="{% url 'prediction_image' prediction.id %}"
                     alt="MRI Scan"
                 >
 

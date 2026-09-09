@@ -337,14 +337,14 @@
 
                     <!-- MRI IMAGE -->
 
-                    <div class="mri-preview">
+     <div class="mri-preview">
 
-                        <img
-                            src="{{ file_path }}"
-                            alt="Uploaded MRI"
-                        >
+    <img
+        src="{% url 'prediction_image' prediction_id %}"
+        alt="Uploaded MRI"
+    >
 
-                    </div>
+</div>
 
 
                     <!-- RESULT INFORMATION -->
