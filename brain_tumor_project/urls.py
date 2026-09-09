@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.conf import settings
-from django.conf.urls.static import static
 from django.urls import include, path
+from django.views.static import serve
 
 
 urlpatterns = [
@@ -11,7 +11,13 @@ urlpatterns = [
 
 
 # Serve uploaded media files
-urlpatterns += static(
-    settings.MEDIA_URL,
-    document_root=settings.MEDIA_ROOT
-)
+# This is needed because Render runs Django with DEBUG=False.
+urlpatterns += [
+    path(
+        "media/<path:path>",
+        serve,
+        {
+            "document_root": settings.MEDIA_ROOT,
+        },
+    ),
+]
