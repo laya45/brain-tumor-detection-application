@@ -1,7 +1,6 @@
 import os
 import numpy as np
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 MODEL_PATH = os.path.join(
@@ -19,30 +18,24 @@ CLASS_LABELS = [
 
 IMAGE_SIZE = (224, 224)
 
-model = None
+_model = None
 
 
 def get_model():
+    global _model
 
-    global model
-
-    if model is None:
-
+    if _model is None:
         import tensorflow as tf
 
         print("Loading brain tumor model...")
-
-        model = tf.keras.models.load_model(
-            MODEL_PATH
-        )
-
+        _model = tf.keras.models.load_model(MODEL_PATH)
         print("Brain tumor model loaded successfully!")
 
-    return model
+    return _model
 
 
 def predict_image(image_path):
-
+    import tensorflow as tf
     from tensorflow.keras.preprocessing import image
 
     model = get_model()
