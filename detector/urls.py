@@ -1,14 +1,8 @@
 from django.urls import path
-
 from . import views
 
 
 urlpatterns = [
-
-    # ========================================================
-    # AUTH
-    # ========================================================
-
     path(
         "auth/",
         views.auth_choice,
@@ -33,19 +27,11 @@ urlpatterns = [
         name="logout"
     ),
 
-    # ========================================================
-    # DASHBOARD
-    # ========================================================
-
     path(
         "",
         views.home,
         name="home"
     ),
-
-    # ========================================================
-    # HISTORY
-    # ========================================================
 
     path(
         "history/",
@@ -53,23 +39,9 @@ urlpatterns = [
         name="history"
     ),
 
-    # ========================================================
-    # PREDICTION DETAIL
-    # ========================================================
-
     path(
         "prediction/<int:prediction_id>/",
         views.prediction_detail,
         name="prediction_detail"
-    ),
-
-    # ========================================================
-    # PRIVATE MRI IMAGE
-    # ========================================================
-
-    path(
-        "prediction/<int:prediction_id>/image/",
-        views.prediction_image,
-        name="prediction_image"
     ),
 ]

@@ -114,10 +114,20 @@
 
             <div class="detail-image">
 
-                <img
-                    src="{% url 'prediction_image' prediction.id %}"
-                    alt="MRI Scan"
-                >
+                {% if prediction.image %}
+
+                    <img
+                        src="{{ prediction.image.url }}"
+                        alt="MRI Scan"
+                    >
+
+                {% else %}
+
+                    <p>
+                        No MRI image available for this prediction.
+                    </p>
+
+                {% endif %}
 
             </div>
 

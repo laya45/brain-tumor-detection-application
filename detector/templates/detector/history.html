@@ -61,6 +61,7 @@
             Dashboard
         </a>
 
+
         <a
             href="{% url 'history' %}"
             class="nav-link"
@@ -207,11 +208,21 @@
                                 href="{% url 'prediction_detail' prediction.id %}"
                             >
 
-                                <img
-                                    src="{% url 'prediction_image' prediction.id %}"
-                                    alt="MRI Scan"
-                                    class="history-image"
-                                >
+                                {% if prediction.image %}
+
+                                    <img
+                                        src="{{ prediction.image.url }}"
+                                        alt="MRI Scan"
+                                        class="history-image"
+                                    >
+
+                                {% else %}
+
+                                    <div class="history-image">
+                                        No Image
+                                    </div>
+
+                                {% endif %}
 
                             </a>
 

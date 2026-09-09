@@ -1,18 +1,15 @@
 import os
 import tempfile
-import uuid
 
 from django.shortcuts import (
     render,
     get_object_or_404,
     redirect,
 )
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse, Http404
-
-from vercel.blob import BlobClient
 
 from .models import Prediction
 from .ml_models import predict_image
@@ -58,9 +55,7 @@ def register(request):
                 }
             )
 
-        if User.objects.filter(
-            username=username
-        ).exists():
+        if User.objects.filter(username=username).exists():
 
             return render(
                 request,
@@ -107,10 +102,7 @@ def login_view(request):
 
         if user is not None:
 
-            login(
-                request,
-                user
-            )
+            login(request, user)
 
             return redirect("home")
 
@@ -141,68 +133,6 @@ def logout_view(request):
 
 
 # ============================================================
-# UPLOAD MRI TO VERCEL BLOB
-# ============================================================
-
-def upload_to_vercel_blob(upload_file):
-
-    extension = os.path.splitext(
-        upload_file.name
-    )[1].lower()
-
-    blob_filename = (
-        f"mri/{uuid.uuid4().hex}{extension}"
-    )
-
-    temporary_path = None
-
-    try:
-
-        # ----------------------------------------------------
-        # Create temporary file in /tmp
-        # ----------------------------------------------------
-
-        with tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=extension
-        ) as temp_file:
-
-            temporary_path = temp_file.name
-
-            for chunk in upload_file.chunks():
-
-                temp_file.write(chunk)
-
-        # ----------------------------------------------------
-        # Upload to private Vercel Blob
-        # ----------------------------------------------------
-
-        with BlobClient() as client:
-
-            blob = client.upload_file(
-                temporary_path,
-                blob_filename,
-                access="private",
-                content_type=(
-                    upload_file.content_type
-                    or "application/octet-stream"
-                ),
-            )
-
-        return blob, temporary_path
-
-    except Exception:
-
-        if (
-            temporary_path
-            and os.path.exists(temporary_path)
-        ):
-            os.remove(temporary_path)
-
-        raise
-
-
-# ============================================================
 # HOME / MRI ANALYSIS
 # ============================================================
 
@@ -226,9 +156,7 @@ def home(request):
 
     if request.method == "POST":
 
-        upload_file = request.FILES.get(
-            "mri_image"
-        )
+        upload_file = request.FILES.get("mri_image")
 
         # ----------------------------------------------------
         # Validate file exists
@@ -240,9 +168,7 @@ def home(request):
                 request,
                 "detector/home.html",
                 {
-                    "error": (
-                        "Please select an MRI image."
-                    )
+                    "error": "Please select an MRI image."
                 }
             )
 
@@ -265,8 +191,7 @@ def home(request):
                 {
                     "error": (
                         "Invalid file type. "
-                        "Please upload a JPG, JPEG, "
-                        "PNG, or WEBP image."
+                        "Please upload a JPG, JPEG, PNG, or WEBP image."
                     )
                 }
             )
@@ -285,8 +210,7 @@ def home(request):
                 {
                     "error": (
                         "Image is too large. "
-                        "Please upload an image "
-                        "smaller than 4.5 MB."
+                        "Please upload an image smaller than 4.5 MB."
                     )
                 }
             )
@@ -297,19 +221,23 @@ def home(request):
 
             # =================================================
             # STEP 1
-            # Upload MRI to Vercel Blob
+            # Create temporary file for TensorFlow
             # =================================================
 
-            blob, temporary_path = (
-                upload_to_vercel_blob(
-                    upload_file
-                )
-            )
+            extension = os.path.splitext(
+                upload_file.name
+            )[1].lower()
 
-            print(
-                "MRI uploaded to Blob:",
-                blob.url
-            )
+            with tempfile.NamedTemporaryFile(
+                delete=False,
+                suffix=extension
+            ) as temp_file:
+
+                temporary_path = temp_file.name
+
+                for chunk in upload_file.chunks():
+
+                    temp_file.write(chunk)
 
             # =================================================
             # STEP 2
@@ -320,9 +248,7 @@ def home(request):
                 temporary_path
             )
 
-            probabilities = (
-                result["probabilities"]
-            )
+            probabilities = result["probabilities"]
 
             print(
                 "Prediction:",
@@ -336,49 +262,51 @@ def home(request):
 
             # =================================================
             # STEP 3
-            # Save prediction in PostgreSQL
+            # Create prediction record
             # =================================================
 
-            prediction_record = (
-                Prediction.objects.create(
-                    user=request.user,
+            prediction_record = Prediction.objects.create(
 
-                    image_url=blob.url,
+                user=request.user,
 
-                    predicted_class=(
-                        result["predicted_class"]
-                    ),
+                predicted_class=(
+                    result["predicted_class"]
+                ),
 
-                    confidence=(
-                        result["confidence"]
-                    ),
+                confidence=(
+                    result["confidence"]
+                ),
 
-                    glioma_probability=(
-                        probabilities["Glioma"]
-                    ),
+                glioma_probability=(
+                    probabilities["Glioma"]
+                ),
 
-                    meningioma_probability=(
-                        probabilities[
-                            "Meningioma"
-                        ]
-                    ),
+                meningioma_probability=(
+                    probabilities["Meningioma"]
+                ),
 
-                    no_tumor_probability=(
-                        probabilities[
-                            "No Tumor"
-                        ]
-                    ),
+                no_tumor_probability=(
+                    probabilities["No Tumor"]
+                ),
 
-                    pituitary_tumor_probability=(
-                        probabilities[
-                            "Pituitary Tumor"
-                        ]
-                    ),
-                )
+                pituitary_tumor_probability=(
+                    probabilities["Pituitary Tumor"]
+                ),
             )
 
             # =================================================
             # STEP 4
+            # Save MRI image using Django ImageField
+            # =================================================
+
+            prediction_record.image.save(
+                upload_file.name,
+                upload_file,
+                save=True
+            )
+
+            # =================================================
+            # STEP 5
             # Display result
             # =================================================
 
@@ -388,12 +316,8 @@ def home(request):
                 {
                     "uploaded": True,
 
-                    "file_path": None,
-
                     "prediction": (
-                        result[
-                            "predicted_class"
-                        ]
+                        result["predicted_class"]
                     ),
 
                     "confidence": round(
@@ -402,34 +326,31 @@ def home(request):
                     ),
 
                     "glioma": round(
-                        probabilities["Glioma"]
-                        * 100,
+                        probabilities["Glioma"] * 100,
                         2
                     ),
 
                     "meningioma": round(
-                        probabilities[
-                            "Meningioma"
-                        ] * 100,
+                        probabilities["Meningioma"] * 100,
                         2
                     ),
 
                     "no_tumor": round(
-                        probabilities[
-                            "No Tumor"
-                        ] * 100,
+                        probabilities["No Tumor"] * 100,
                         2
                     ),
 
                     "pituitary_tumor": round(
-                        probabilities[
-                            "Pituitary Tumor"
-                        ] * 100,
+                        probabilities["Pituitary Tumor"] * 100,
                         2
                     ),
 
                     "prediction_id": (
                         prediction_record.id
+                    ),
+
+                    "prediction_record": (
+                        prediction_record
                     ),
                 }
             )
@@ -456,14 +377,12 @@ def home(request):
         finally:
 
             # ------------------------------------------------
-            # Delete temporary /tmp file
+            # Delete temporary TensorFlow file
             # ------------------------------------------------
 
             if (
                 temporary_path
-                and os.path.exists(
-                    temporary_path
-                )
+                and os.path.exists(temporary_path)
             ):
 
                 os.remove(
@@ -480,21 +399,15 @@ def history(request):
 
     predictions = (
         Prediction.objects
-        .filter(
-            user=request.user
-        )
-        .order_by(
-            "-created_at"
-        )
+        .filter(user=request.user)
+        .order_by("-created_at")
     )
 
     for prediction in predictions:
 
-        prediction.confidence_display = (
-            round(
-                prediction.confidence * 100,
-                2
-            )
+        prediction.confidence_display = round(
+            prediction.confidence * 100,
+            2
         )
 
     return render(
@@ -524,76 +437,8 @@ def prediction_detail(
 
     return render(
         request,
-        "detector/prediction_detail.html",
+        "detector/prediction_details.html",
         {
             "prediction": prediction_record
         }
     )
-
-
-# ============================================================
-# SECURE PRIVATE MRI IMAGE
-# ============================================================
-
-@login_required
-def prediction_image(request, prediction_id):
-
-    prediction = get_object_or_404(
-        Prediction,
-        id=prediction_id,
-        user=request.user
-    )
-
-    if not prediction.image_url:
-        raise Http404("MRI image not found.")
-
-    blob_url = prediction.image_url
-
-    # Get the Vercel Blob token
-    token = os.environ.get("BLOB_READ_WRITE_TOKEN")
-
-    if not token:
-        print("ERROR: BLOB_READ_WRITE_TOKEN is not available.")
-        raise Http404("Blob authentication is not configured.")
-
-    try:
-        import urllib.request
-
-        # Request the private Blob with authentication
-        blob_request = urllib.request.Request(
-            blob_url,
-            headers={
-                "Authorization": f"Bearer {token}"
-            }
-        )
-
-        with urllib.request.urlopen(blob_request, timeout=30) as response:
-
-            image_data = response.read()
-
-            content_type = response.headers.get(
-                "Content-Type",
-                "image/jpeg"
-            )
-
-        django_response = HttpResponse(
-            image_data,
-            content_type=content_type
-        )
-
-        # Do not allow the private MRI image to be cached publicly
-        django_response["Cache-Control"] = "private, no-store"
-        django_response["X-Content-Type-Options"] = "nosniff"
-
-        return django_response
-
-    except Exception as e:
-
-        print(
-            "Private MRI image error:",
-            repr(e)
-        )
-
-        raise Http404(
-            "Unable to retrieve MRI image."
-        )

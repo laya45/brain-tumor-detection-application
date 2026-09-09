@@ -4,7 +4,9 @@ import os
 from dotenv import load_dotenv
 import dj_database_url
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # Load local environment variables
 load_dotenv(BASE_DIR / ".env.local")
@@ -25,14 +27,7 @@ DEBUG = os.environ.get(
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    ".vercel.app",
 ]
-
-
-if os.environ.get("VERCEL_URL"):
-    ALLOWED_HOSTS.append(
-        os.environ.get("VERCEL_URL")
-    )
 
 
 INSTALLED_APPS = [
@@ -88,6 +83,10 @@ TEMPLATES = [
 WSGI_APPLICATION = "brain_tumor_project.wsgi.application"
 
 
+# ============================================================
+# DATABASE
+# ============================================================
+
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
@@ -95,6 +94,10 @@ DATABASES = {
     )
 }
 
+
+# ============================================================
+# PASSWORD VALIDATION
+# ============================================================
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -116,6 +119,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# ============================================================
+# INTERNATIONALIZATION
+# ============================================================
+
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "Asia/Kolkata"
@@ -125,9 +132,22 @@ USE_I18N = True
 USE_TZ = True
 
 
+# ============================================================
+# STATIC FILES
+# ============================================================
+
 STATIC_URL = "/static/"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+# ============================================================
+# MEDIA FILES
+# ============================================================
+
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = BASE_DIR / "media"
 
 
 STORAGES = {
@@ -143,10 +163,9 @@ STORAGES = {
 }
 
 
-MEDIA_URL = "/media/"
-
-MEDIA_ROOT = BASE_DIR / "media"
-
+# ============================================================
+# AUTHENTICATION
+# ============================================================
 
 LOGIN_URL = "/auth/"
 
@@ -155,14 +174,16 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/auth/"
 
 
+# ============================================================
+# CSRF
+# ============================================================
+
 CSRF_TRUSTED_ORIGINS = []
 
 
-if os.environ.get("VERCEL_URL"):
-    CSRF_TRUSTED_ORIGINS.append(
-        f"https://{os.environ.get('VERCEL_URL')}"
-    )
-
+# ============================================================
+# PRODUCTION SECURITY
+# ============================================================
 
 if not DEBUG:
 
@@ -177,6 +198,10 @@ if not DEBUG:
         "https"
     )
 
+
+# ============================================================
+# DEFAULT PRIMARY KEY
+# ============================================================
 
 DEFAULT_AUTO_FIELD = (
     "django.db.models.BigAutoField"
